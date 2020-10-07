@@ -1,0 +1,28 @@
+steps:
+
+  - id: build-test-image
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker image build --target build --tag greeting:test .
+
+  - id: run-tests
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker container run greeting:test go test
+
+  - id: build-app
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker image build -f Dockerfile.prod --tag gcr.io/${PROJECT_ID}/greeting:${COMMIT_SHA} .
+
+images:
+  - gcr.io/${PROJECT_ID}/greeting:${COMMIT_SHA}

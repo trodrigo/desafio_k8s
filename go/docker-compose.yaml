@@ -1,0 +1,15 @@
+version: '3'
+services:
+  codeeducation:
+    container_name: golang
+    build: .
+    # command: go run main.go
+    # command: go test -v
+    volumes:
+      - ./src:/go/src/app
+    working_dir: /go/src/app
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+    #   TEXT: Code.education Rocks!

@@ -1,0 +1,82 @@
+# Criando um Deploy no Minikube
+
+### Iniciando a instância
+Executar os comando para iniciar os testes e ver o status do host
+```
+$ minikube start laboratorio
+$ minikube status
+$ minikube addons enable ingress
+$ kubectl get namespaces
+```
+
+### Painel de controle
+Abre o dashboard do K8s
+```
+$ minikube dashboard
+```
+
+### 1 - Servidor Web Nginx
+Utilize a imagem base do Nginx Alpine **Disponibilize 3 réplicas**
+Quando alguém acessar o IP externo do LoadBalancer do serviço criado, ou em caso de utilização do Minikube usando "minikube service nome-do-servico", deve ser exibido no browser: **Code.education Rocks**.
+
+```
+kubectl apply -f nginx/deployment.yaml
+```
+
+Verificar se os pods estão rodando:
+
+```
+kubectl get pods --selector app=nginx  --show-labels
+```
+Criando um service para expor os pods:
+```
+kubectl apply -f nginx/service.yaml
+```
+
+Para acessar o Load Balancer no navegador
+```
+$ minikube service nginx-service
+```
+
+### 2 - Servidor DB Mysql
+Faça o processo de configuração de um servidor de banco de dados MySQL Utilize secret em conjunto com as variáveis de ambiente Utilize disco persistente para gravar as informações dos dados
+
+Criando um secret para senha do MYSQL_ROOT_PASSWORD
+```
+$ kubectl create secret generic mysql-pass --from-literal=password='123456'
+```
+
+Criando um volume persistente
+```
+$ kubectl apply -f mysql/persistent-volume.yaml
+```
+
+Aplicando deploy do Mysql
+```
+$ kubectl apply -f mysql/deployments.yaml
+```
+Verificando os pods
+```
+$ kubectl get pods --show-labels
+
+mysql-server-7c5c74f99c-bjxkv   1/1     Running   0          57s    app=mysql-server,pod-template-hash=7c5c74f99c,tier=db
+nginx-649d9644f6-hk2bc          1/1     Running   0          117m   app=nginx,pod-template-hash=649d9644f6
+nginx-649d9644f6-pgd9c          1/1     Running   0          117m   app=nginx,pod-template-hash=649d9644f6
+nginx-649d9644f6-t9bs2          1/1     Running   0          117m   app=nginx,pod-template-hash=649d9644f6
+
+```
+
+
+## Deploy com linha de comando
+
+Criando um deployment hardcore
+```
+$ kubectl create deployment hello-nginx --image=nginx:1.17-alpine
+$ kubectl get deplyments
+```
+Criando um servico para expor o POD
+```
+$ kubectl expose deployment hello-nginx --type=LoadBalancer --port=80
+$ kubectl get services
+$ minikube service hello-nginx
+```
